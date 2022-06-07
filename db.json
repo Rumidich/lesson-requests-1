@@ -1,3 +1,28 @@
 {
-  "todos": []
+  "todos": [
+    {
+      "todo": "Do morning workout",
+      "id": 1
+    },
+    {
+      "todo": "Do morning workout",
+      "id": 2
+    },
+    {
+      "todo": "Do morning meditation",
+      "id": 3
+    },
+    {
+      "todo": "Have a breakfast",
+      "id": 4
+    },
+    {
+      "todo": "Make a coffee",
+      "id": 5
+    },
+    {
+      "todo": "Start coding",
+      "id": 6
+    }
+  ]
 }
