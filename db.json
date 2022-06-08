@@ -1,44 +1,12 @@
 {
   "todos": [
     {
-      "todo": "Do morning workout",
+      "todo": "Wake Up",
       "id": 1
-    },
-    {
-      "todo": "Do morning meditation",
-      "id": 3
     },
     {
       "todo": "Have a breakfast",
       "id": 4
-    },
-    {
-      "todo": "Make a coffee",
-      "id": 5
-    },
-    {
-      "todo": "Start coding",
-      "id": 6
-    },
-    {
-      "todo": "Get Awesome",
-      "id": 7
-    },
-    {
-      "todo": "Go to Bootcamp",
-      "id": 8
-    },
-    {
-      "todo": "Study JavaScript",
-      "id": 9
-    },
-    {
-      "todo": "Do ClassWork",
-      "id": 10
-    },
-    {
-      "todo": "Go back Home",
-      "id": 11
     }
   ]
 }
