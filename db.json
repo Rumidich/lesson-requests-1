@@ -1,3 +1,12 @@
 {
-  "todos": []
+  "todos": [
+    {
+      "todo": "Wake Up",
+      "id": 1
+    },
+    {
+      "todo": "Have a breakfast",
+      "id": 4
+    }
+  ]
 }
