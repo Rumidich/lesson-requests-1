@@ -52,6 +52,20 @@ btnAdd.addEventListener("click", async function () {
 });
 
 //! READ
+
+//! Search
+let inpSearch = document.getElementById("inp-search");
+// console.log(inpSearch);
+inpSearch.addEventListener("input", function () {
+  // console.log("input!");
+  getTodos();
+});
+
+//! pagination
+let pagination = document.getElementById("pagination");
+// console.log(pagination);
+let page = 1;
+
 // получаем элемент, чтобы в нем отобоазить все таски
 let list = document.getElementById("list");
 // проверяем в консоли, чтобы убедиться, что в переменной list сейчас НЕ пусто
@@ -61,35 +75,108 @@ let list = document.getElementById("list");
 // сначала получили данные и только потом записали все в переменную response,
 // иначе (если мы НЕ дождемся) туда запишется pending (состояние промиса, который еще не выполнен)
 async function getTodos() {
-  let response = await fetch(API) // если не указать метод запроса, то по умолчанию это GET запрос
-    .then(res => res.json()) // переводим все в json формат
-    .catch(err => console.log(err)); // отловили ошибку
-  // console.log(response);
-  // очищаем div#list, чтобы список тасков корректно отображался
-  // и не хранил там предыдущие html-элементы со старыми данными
-  list.innerHTML = "";
-  // перебираем полученный из db.json массив и для каждого объекта из этого массива создаем div и задаем ему сожержимое
+  let response = await fetch(
+    `${API}?q=${inpSearch.value}&_page=${page}&_limit=2`
+  ).then(res => res.json()) //если не указать метод запроса, то по умолчанию это GET запрос
+  .catch (err => console.log(err));// перебираем полученный из db.json массив и для каждого объекта из этого массива создаем div и задаем ему сожержимое
   // через метод innerHTML, каждый созданный элемент аппендим в div#list
+
+  // allTodos - все элементы из db.json
+  let allTodos = await fetch(API)
+  .then(res => res.json())
+  .catch(err => console.log(err));
+
+// console.log(allTodos.length / 2);
+// посчитали какой будет последняя страница
+let lastPage = Math.ceil(allTodos.length / 2);
+// очищаем div#list чтобы список тасков корректно отображался и не хранил там предыдущее html-элементы
+list.innerHTML = "";
 
   response.forEach(item => {
     let newElem = document.createElement("div");
     newElem.id = item.id;
     newElem.innerHTML = `<span>${item.todo}</span>
-    <button class="btn-delete">Delete</button>`;
+    <button class="btn-delete">Delete</button>
+    <button class="btn-edit">Edit</button>`;
     list.append(newElem);
   });
+
+  // добавляем пагинацию 
+  pagination.innerHTML = `
+  <button id="btn-prev" ${page === 1 ? "disabled" : ""}>Prev</button>
+  <span>${page}</span>
+  <button ${page === lastPage ? "disabled" : ""} id="btn-next">Next</button>
+  `;
 }
-// вызываем функцию, чтобы как только откроется страница что-то было отображено
+
+// вызываем функцию, чтоб как только откроется страница что-то было отображено
 getTodos();
 
-document.addEventListener('click', async function(e){
-  if(e.target.className === "btn-delete"){
-let id = e.target.parentNode.id;
-await fetch(`${API}/${id}`, {
-  method: "DELETE",
-})
-  }
+// элементы из модалки для редактирования
+let modalEdit = document.getElementById("modal-edit");
+let modalEditClose = document.getElementById("modal-edit-close");
+
+let inpEditTodo = document.getElementById("inp-edit-todo");
+let inpEditId = document.getElementById("inp-edit-id");
+let btnSaveEdit = document.getElementById("btn-save-edit");
+// console.log(inpEditTodo, inpEditId, btnSaveEdit);
+
+// функция для закрытия модалки
+modalEditClose.addEventListener("click", function () {
+  modalEdit.style.display = "none";
+});
+// функция для сохранения изменений при редактировании
+btnSaveEdit.addEventListener("click", async function () {
+  // объект с отредактированнымм данными
+  let editedTodo = {
+    todo: inpEditTodo.value,
+  };
+  let id = inpEditId.value;
+  // запрос для изменения данных
+  await fetch(`${API}/${id}`, {
+    method: "PATCH", // указываем метод
+    body: JSON.stringify(editedTodo), // указываем что именно нужно запостить
+    headers: {
+      "Content-type": "application/json; charset=utf-8",
+    }, // кодировка
+  });
+  // после изменения закрываем модалку для эдит
+  modalEdit.style.display = "none";
   getTodos();
-// console.log(e.target.className);
-console.log(e.target.parentNode.id);
-})
+});
+
+document.addEventListener("click", async function (e) {
+  //! Delete
+  if (e.target.className === "btn-delete") {
+    // запрос для удаления
+    let id = e.target.parentNode.id;
+    await fetch(`${API}/${id}`, {
+      method: "DELETE",
+    });
+    getTodos();
+  }
+  //! Update (edit)
+  if (e.target.className === "btn-edit") {
+    modalEdit.style.display = "flex";
+    let id = e.target.parentNode.id;
+    // запрос для получения данных чтобы мы могли отобразить все в модалке для редактирования
+    // console.log(id);
+    let response = await fetch(`${API}/${id}`)
+      .then(res => res.json())
+      .catch(err => console.log(err));
+      // полученные данные отображаем в инпутах из html
+    // console.log(response);
+    inpEditTodo.value = response.todo;
+    inpEditId.value = response.id;
+  }
+  // console.log(e.target.parentNode.id);
+  //! Pagination
+  if (e.target.id === "btn-next") {
+    page++;
+    getTodos();
+  }
+  if (e.target.id === "btn-prev") {
+    page--;
+    getTodos();
+  }
+});

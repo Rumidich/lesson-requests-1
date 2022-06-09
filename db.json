@@ -1,11 +1,15 @@
 {
   "todos": [
     {
-      "todo": "Wake Up",
+      "todo": "clean the room",
       "id": 1
     },
     {
-      "todo": "Have a breakfast",
+      "todo": "Do morning meditation",
+      "id": 3
+    },
+    {
+      "todo": "have breakfast",
       "id": 4
     }
   ]
